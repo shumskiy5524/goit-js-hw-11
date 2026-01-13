@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = 'https://pixabay.com/api/';
+// Встав свій унікальний ключ Pixabay
 const API_KEY = '54182514-8e89b17f0b2f5be4b382492b8';
+const BASE_URL = 'https://pixabay.com/api/';
 
 export async function getImagesByQuery(query) {
   try {
@@ -14,7 +15,7 @@ export async function getImagesByQuery(query) {
         safesearch: true,
       },
     });
-    return response.data;
+    return response.data.hits; // масив зображень
   } catch (error) {
     console.error('Pixabay API error:', error);
     throw error;

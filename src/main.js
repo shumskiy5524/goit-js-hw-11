@@ -1,38 +1,46 @@
-import { getImagesByQuery } from './pixabay-api.js';
-import { createGallery, clearGallery, showLoader, hideLoader } from './render-functions.js';
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
+// Імпорт функцій з локальних файлів
+import { getImagesByQuery } from "./pixabay-api.js";
+import { 
+  createGallery, 
+  clearGallery, 
+  showLoader, 
+  hideLoader, 
+  showNoResultsToast 
+} from "./render-functions.js";
 
-const form = document.querySelector('.form');
+// Селектори форми та поля вводу
+const form = document.querySelector(".form");
 const input = form.querySelector('input[name="search-text"]');
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const query = input.value.trim();
+  if (!query) return; // перевірка на пустий рядок
 
-  if (!query) {
-    iziToast.error({ title: 'Error', message: 'Search field cannot be empty!' });
-    return;
-  }
-
-  clearGallery();
-  showLoader();
+  clearGallery();  // очищаємо старі результати
+  showLoader();    // показуємо лоадер
 
   try {
-    const data = await getImagesByQuery(query);
+    const images = await getImagesByQuery(query); // запит до Pixabay API
 
-    if (!data.hits.length) {
-      iziToast.info({
-        title: 'No results',
-        message: 'Sorry, there are no images matching your search query. Please try again!',
-      });
-      return;
+    if (images.length === 0) {
+      showNoResultsToast(); // повідомлення, якщо нічого не знайдено
+    } else {
+      createGallery(images); // рендеримо галерею
     }
 
-    createGallery(data.hits);
   } catch (error) {
-    iziToast.error({ title: 'Error', message: 'Something went wrong!' });
+    console.error(error);
+    // повідомлення про помилку запиту
+    import("izitoast").then(({ default: iziToast }) => {
+      iziToast.error({
+        title: 'Error',
+        message: 'Something went wrong while fetching images!',
+        position: 'topRight'
+      });
+    });
   } finally {
-    hideLoader();
+    hideLoader(); // ховаємо лоадер
   }
 });

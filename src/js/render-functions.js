@@ -1,40 +1,47 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
-const gallery = document.querySelector('.gallery');
-const loader = document.querySelector('.loader');
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-});
+const galleryElement = document.querySelector(".gallery");
+let lightbox = new SimpleLightbox(".gallery a");
 
 export function createGallery(images) {
-  const markup = images
-    .map(
-      ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `
-      <li>
-        <a href="${largeImageURL}">
-          <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-        </a>
-        <p>❤️ ${likes} 👁️ ${views} 💬 ${comments} ⬇️ ${downloads}</p>
-      </li>
-    `
-    )
-    .join('');
+  const markup = images.map(img => `
+    <li class="gallery-item">
+      <a href="${img.largeImageURL}">
+        <img src="${img.webformatURL}" alt="${img.tags}" loading="lazy" />
+      </a>
+      <div class="info">
+        <p>Likes: ${img.likes}</p>
+        <p>Views: ${img.views}</p>
+        <p>Comments: ${img.comments}</p>
+        <p>Downloads: ${img.downloads}</p>
+      </div>
+    </li>
+  `).join("");
 
-  gallery.insertAdjacentHTML('beforeend', markup);
+  galleryElement.innerHTML = markup;
   lightbox.refresh();
 }
 
 export function clearGallery() {
-  gallery.innerHTML = '';
+  galleryElement.innerHTML = "";
 }
 
 export function showLoader() {
-  loader.classList.add('is-visible');
+  document.querySelector(".loader").classList.remove("hidden");
 }
 
 export function hideLoader() {
-  loader.classList.remove('is-visible');
+  document.querySelector(".loader").classList.add("hidden");
+}
+
+export function showNoResultsToast() {
+  iziToast.error({
+    title: 'Oops!',
+    message: 'Sorry, there are no images matching your search query. Please try again!',
+    position: 'topRight'
+  });
 }
