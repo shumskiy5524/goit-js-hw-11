@@ -1,38 +1,38 @@
-// Імпорт функцій з локальних файлів
-import { getImagesByQuery } from "./pixabay-api.js";
+import "./css/styles.css";
+import "simplelightbox/dist/simple-lightbox.min.css";
+import "izitoast/dist/css/iziToast.min.css";
+
+import { getImagesByQuery } from "./js/pixabay-api.js";
 import { 
   createGallery, 
   clearGallery, 
   showLoader, 
   hideLoader, 
   showNoResultsToast 
-} from "./render-functions.js";
+} from "./js/render-functions.js";
 
-// Селектори форми та поля вводу
 const form = document.querySelector(".form");
 const input = form.querySelector('input[name="search-text"]');
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const query = input.value.trim();
-  if (!query) return; // перевірка на пустий рядок
+  if (!query) return;
 
-  clearGallery();  // очищаємо старі результати
-  showLoader();    // показуємо лоадер
+  clearGallery();
+  showLoader();
 
   try {
-    const images = await getImagesByQuery(query); // запит до Pixabay API
+    const images = await getImagesByQuery(query);
 
     if (images.length === 0) {
-      showNoResultsToast(); // повідомлення, якщо нічого не знайдено
+      showNoResultsToast();
     } else {
-      createGallery(images); // рендеримо галерею
+      createGallery(images);
     }
 
   } catch (error) {
     console.error(error);
-    // повідомлення про помилку запиту
     import("izitoast").then(({ default: iziToast }) => {
       iziToast.error({
         title: 'Error',
@@ -41,6 +41,6 @@ form.addEventListener("submit", async (e) => {
       });
     });
   } finally {
-    hideLoader(); // ховаємо лоадер
+    hideLoader();
   }
 });
